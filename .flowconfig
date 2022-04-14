@@ -1,0 +1,15 @@
+[ignore]
+    .*/node_modules/.*
+    .*/test/.*
+    .*/demo/.*
+    .*/dist/.*
+    .*/scripts/.*
+[include]
+
+[libs]
+
+[lints]
+
+[options]
+
+[strict]
