@@ -1,4 +1,4 @@
-import resolve from 'rollup-plugin-node-resolve';
+import resolve  from '@rollup/plugin-node-resolve';
 import commonjs from 'rollup-plugin-commonjs';
 import babel from 'rollup-plugin-babel';
 import flow from 'rollup-plugin-flow';
@@ -6,11 +6,15 @@ import { terser } from 'rollup-plugin-terser';
 import { eslint } from 'rollup-plugin-eslint';
 import livereload from 'rollup-plugin-livereload'
 import serve from 'rollup-plugin-serve'
+import alias from '@rollup/plugin-alias'
 // 处理node的内置模块,发布node的第三方{builtins, globals}
 // import builtins from 'rollup-plugin-node-builtins';
 // import globals from 'rollup-plugin-node-globals';
 
 import pkg from './package.json';
+const path =require('path')
+ 
+const pathResolve = p => path.resolve(__dirname, p)
 
 const isDev = process.env.NODE_ENV !== 'production';
 
@@ -21,13 +25,22 @@ export default [
 		output: {
 			file: pkg.browser,
 			format: 'umd',
-			name:'ChunkUploadFile',
+			name: 'Vue',
 			sourcemap: true  //生成bundle.map.js文件，方便调试
 		},
 		plugins: [
 			flow(),//移除flow内容
+			alias({
+				entries: [
+					{
+						find:'@',replacement: pathResolve('src')
+
+					},
+				]
+			}),
 			resolve(),  // 这样 Rollup 能找到 `ms`
 			commonjs(), // 这样 Rollup 能转换 `ms` 为一个ES模块
+		
 			eslint({
 				throwOnError: true,
 				throwOnWarning: true,
@@ -36,8 +49,8 @@ export default [
 			}),
 			livereload(),
 			serve({
-				open:true,
-				port:8805,
+				open: true,
+				port: 8805,
 				// 静态资源
 				contentBase: [''],
 			}),
