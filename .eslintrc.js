@@ -4,7 +4,11 @@ module.exports = {
         "es6": true,
         "node": true
     },
-    // "extends": "eslint:recommended",n
+    "parser": "@babel/eslint-parser",
+    "plugins": [
+      "flowtype"
+    ],
+    "extends":[ "eslint:recommended","plugin:flowtype/recommended"],
     // "globals": {
     //     "Atomics": "readonly",
     //     "SharedArrayBuffer": "readonly",
@@ -15,6 +19,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+        "flowtype/no-types-missing-file-annotation": 2
         // "linebreak-style": [
         //   "error",
         //   "unix"

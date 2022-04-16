@@ -21,7 +21,7 @@ if(typeof window !== 'undefined') {
 export default [
 	// browser-friendly UMD build
 	{
-		input: 'src/main.js',
+		input: 'src/index.js',
 		output: [{
 			file: pkg.main,
 			format: 'cjs',

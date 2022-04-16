@@ -1,13 +1,14 @@
 [ignore]
     .*/node_modules/.*
     .*/test/.*
+    .*/flow/.*
     .*/demo/.*
     .*/dist/.*
     .*/scripts/.*
 [include]
 
 [libs]
-
+    flow
 [lints]
 
 [options]
