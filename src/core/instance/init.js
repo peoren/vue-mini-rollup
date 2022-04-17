@@ -9,7 +9,12 @@ export function initMixin(Vue: Component){
         vm._uid = uid++
         // 合并option到$option上,这里略过
         vm.$options = options
+        // 一系列的初始化
         initState(vm)
+        // 挂载
+        if(vm.$options.el){
+            vm.$mount(vm.$options.el)
+        }
     }
 }
 

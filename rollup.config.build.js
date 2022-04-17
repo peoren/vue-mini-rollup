@@ -12,7 +12,9 @@ import alias from '@rollup/plugin-alias'
 // import globals from 'rollup-plugin-node-globals';
 
 import pkg from './package.json';
-
+const path =require('path')
+ 
+const pathResolve = p => path.resolve(__dirname, p)
 const isDev = process.env.NODE_ENV !== 'production';
 // 一段自定义的内容，以下内容会添加到打包结果中
 const footer = `
@@ -44,7 +46,8 @@ export default [
 			alias({
 				entries: [
 					{
-						find: '@', replacement: resolve('src')
+						find:'@',replacement: pathResolve('src')
+
 					},
 				]
 			}),

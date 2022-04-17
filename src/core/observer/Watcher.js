@@ -1,11 +1,17 @@
+/* eslint-disable no-unused-vars */
 // @flow
 
 import Dep from "./Dep"
 export default class Watcher {
-  constructor(target: object, expression: stirng, callback: function) {
+  constructor(target: object, expOrFn: string, callback: Function , options?: object,isRenderWatcher?: boolean) {
     //   存储信息
     this.target = target
-    this.getter = parsePath(expression)
+    if(typeof expOrFn === 'function'){
+      this.getter = expOrFn
+    }else{
+
+      this.getter = parsePath(expOrFn)
+    }
     this.value= this.get()
     this.callback = callback
   }
@@ -15,6 +21,7 @@ export default class Watcher {
   * @return: 
   */
   get() {
+    // TODO:将_target_改为栈的方式
     Dep.__target__ = this
     // 得到当前值并且触发监听目标的getter函数，添加Watcher实例为依赖
     const value = this.getter(this.target)
@@ -29,7 +36,7 @@ export default class Watcher {
   * @param {type} 
   * @return: 
   */
-  getAndInvoke(callback: function){
+  getAndInvoke(callback: Function){
     const newValue = this.getter(this.target)
     const oldValue = this.value
     if(newValue !== oldValue || typeof newValue == 'object'){

@@ -20,3 +20,18 @@ export  function def(obj: object,key: string,value: ?any,enumerable: ?boolean) {
         configurable:true
     })
 }
+/**
+* @description:寻找dom
+* @param {*} el:dom的寻找字符串或者Element
+* @return: 
+*/
+export function query(el: string | Element) {
+    if(typeof el ==='string'){
+        const selected = document.querySelector(el)
+        return selected
+    }else{
+        return el
+    }
+}
+// 只是一个功空函数
+export function noop(){}
