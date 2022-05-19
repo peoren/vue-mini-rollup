@@ -17,6 +17,7 @@ export default function defineReactive(data: object, key: string, val: any = dat
         if(childOb){
           // 这一部分dep依赖收集用于数组push的依赖和vue的$set方法和$delete
           childOb.dep.depend()
+          // 未处理数组的情况
         }
       }
       return val

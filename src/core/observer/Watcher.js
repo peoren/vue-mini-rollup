@@ -1,18 +1,22 @@
 /* eslint-disable no-unused-vars */
+
 // @flow
 
 import Dep from "./Dep"
+import { pushTarget, popTarget } from "./Dep"
+let uid = 0
 export default class Watcher {
-  constructor(target: object, expOrFn: string, callback: Function , options?: object,isRenderWatcher?: boolean) {
+  constructor(target: object, expOrFn: string, callback: Function, options?: object, isRenderWatcher?: boolean) {
     //   存储信息
     this.target = target
-    if(typeof expOrFn === 'function'){
+    this.id = ++uid
+    if (typeof expOrFn === 'function') {
       this.getter = expOrFn
-    }else{
+    } else {
 
       this.getter = parsePath(expOrFn)
     }
-    this.value= this.get()
+    this.value = this.get()
     this.callback = callback
   }
   /**
@@ -21,27 +25,37 @@ export default class Watcher {
   * @return: 
   */
   get() {
-    // TODO:将_target_改为栈的方式
-    Dep.__target__ = this
+    let value
+    // 入栈
+    pushTarget(this)
     // 得到当前值并且触发监听目标的getter函数，添加Watcher实例为依赖
-    const value = this.getter(this.target)
-    Dep.__target__ = null
+    try {
+      // TODO:未处理getter为函数的情况
+      value = this.getter(this.target)
+    } catch (error) {
+      console.error(error);
+      throw error
+    } finally {
+      // 出栈
+      popTarget()
+    }
     return value
+
   }
-  update(){
-      this.getAndInvoke(this.callback)
+  update() {
+    this.getAndInvoke(this.callback)
   }
   /**
   * @description:在收到更新通知后更新当前值，执行回调函数
   * @param {type} 
   * @return: 
   */
-  getAndInvoke(callback: Function){
+  getAndInvoke(callback: Function) {
     const newValue = this.getter(this.target)
     const oldValue = this.value
-    if(newValue !== oldValue || typeof newValue == 'object'){
-        this.value = newValue
-        callback.call(this.target,newValue,oldValue)
+    if (newValue !== oldValue || typeof newValue == 'object') {
+      this.value = newValue
+      callback.call(this.target, newValue, oldValue)
     }
   }
 }
@@ -49,7 +63,7 @@ function parsePath(path: stirng): object {
 
   if (path) {
     return (object) => {
-        let pathArray = path.split(".")
+      let pathArray = path.split(".")
       for (let index = 0; index < pathArray.length; index++) {
         object = object[pathArray[index]]
       }

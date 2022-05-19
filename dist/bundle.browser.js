@@ -477,16 +477,18 @@
   function noop() {}
 
   //      
-
+  var uid$2 = 0;
   /**
   * @description:Class 依赖类
   * @param {type} 
   * @return: 
   */
+
   var Dep = /*#__PURE__*/function () {
     function Dep() {
       _classCallCheck(this, Dep);
 
+      this.id = ++uid$2;
       this.subs = []; //用于存储Watcher实例依赖    
     }
 
@@ -508,7 +510,17 @@
     }]);
 
     return Dep;
-  }();
+  }(); // vue 2.x使用中等粒度也就是，组件为粒度进行监听，会存在父子组件嵌套的情况，由于调用render函数实在watcher中监听的时候调用，就会存在
+  Dep.__target__ = null;
+  var targetStack = []; // 暴露出出入栈方法
+
+  function pushTarget(target) {
+    targetStack.push(target);
+  }
+  function popTarget() {
+    targetStack.pop();
+    Dep.__target__ = targetStack[targetStack.length - 1];
+  }
 
   //      
   /**
@@ -529,7 +541,7 @@
 
           if (childOb) {
             // 这一部分dep依赖收集用于数组push的依赖和vue的$set方法和$delete
-            childOb.dep.depend();
+            childOb.dep.depend(); // 未处理数组的情况
           }
         }
 
@@ -831,11 +843,11 @@
   } // methods和props相互检查在initMethods中检查
 
   //      
-  var uid = 0;
+  var uid$1 = 0;
   function initMixin(Vue) {
     Vue.prototype._init = function (options) {
       var vm = this;
-      vm._uid = uid++; // 合并option到$option上,这里略过
+      vm._uid = uid$1++; // 合并option到$option上,这里略过
 
       vm.$options = options; // 一系列的初始化
 
@@ -1232,12 +1244,15 @@
     ];
   });
 
+  var uid = 0;
+
   var Watcher = /*#__PURE__*/function () {
     function Watcher(target, expOrFn, callback, options, isRenderWatcher) {
       _classCallCheck(this, Watcher);
 
       //   存储信息
       this.target = target;
+      this.id = ++uid;
 
       if (typeof expOrFn === 'function') {
         this.getter = expOrFn;
@@ -1258,11 +1273,21 @@
     _createClass(Watcher, [{
       key: "get",
       value: function get() {
-        // TODO:将_target_改为栈的方式
-        Dep.__target__ = this; // 得到当前值并且触发监听目标的getter函数，添加Watcher实例为依赖
+        var value; // 入栈
 
-        var value = this.getter(this.target);
-        Dep.__target__ = null;
+        pushTarget(this); // 得到当前值并且触发监听目标的getter函数，添加Watcher实例为依赖
+
+        try {
+          // TODO:未处理getter为函数的情况
+          value = this.getter(this.target);
+        } catch (error) {
+          console.error(error);
+          throw error;
+        } finally {
+          // 出栈
+          popTarget();
+        }
+
         return value;
       }
     }, {
