@@ -12,7 +12,10 @@ module.exports = {
     plugins: [
       "flowtype"
     ],
-    extends:[ "eslint:recommended","plugin:flowtype/recommended"]
+    extends:[ "eslint:recommended","plugin:flowtype/recommended"],
+    rules:[
+      "no-console": "off",
+    ]
 
 
 };
